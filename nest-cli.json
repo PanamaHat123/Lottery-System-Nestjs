@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/lottery-app/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": false,
+    "tsConfigPath": "apps/lottery-app/tsconfig.app.json",
+    "assets": [
+      "**/*.json"
+    ]
+  },
+  "monorepo": true,
+  "root": "apps/lottery-app/",
+  "entryFile": "lottery-app/src/Application",
+  "projects": {
+    "lottery-app": {
+      "type": "application",
+      "root": "apps/lottery-app",
+      "entryFile": "Application",
+      "sourceRoot": "apps/lottery-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/lottery-app/tsconfig.app.json"
+      }
+    },
+    "lottery-domain": {
+      "type": "application",
+      "root": "apps/lottery-domain",
+      "entryFile": "main",
+      "sourceRoot": "apps/lottery-domain/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/lottery-domain/tsconfig.app.json"
+      }
+    },
+    "lottery-infrastructure": {
+      "type": "application",
+      "root": "apps/lottery-infrastructure",
+      "entryFile": "main",
+      "sourceRoot": "apps/lottery-infrastructure/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/lottery-infrastructure/tsconfig.app.json"
+      }
+    },
+    "lottery-trigger": {
+      "type": "application",
+      "root": "apps/lottery-trigger",
+      "entryFile": "main",
+      "sourceRoot": "apps/lottery-trigger/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/lottery-trigger/tsconfig.app.json"
+      }
+    },
+    "lottery-types": {
+      "type": "application",
+      "root": "apps/lottery-types",
+      "entryFile": "main",
+      "sourceRoot": "apps/lottery-types/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/lottery-types/tsconfig.app.json"
+      }
+    },
+    "lottery-api": {
+      "type": "application",
+      "root": "apps/lottery-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/lottery-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/lottery-api/tsconfig.app.json"
+      }
+    }
+  }
+}
