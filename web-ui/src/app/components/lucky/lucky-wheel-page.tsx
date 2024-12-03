@@ -7,7 +7,8 @@ import {LuckyWheel} from '@lucky-canvas/react'
 import {queryRaffleAwardList, randomRaffle} from '@/apis'
 import {RaffleAwardVO} from "@/types/RaffleAwardVO";
 
-export function LuckyWheelPage({strategyId}) {
+
+export function LuckyWheelPage({randomOrderId,strategyId,userId,orderId,showUI}) {
     const [prizes, setPrizes] = useState([{}])
     const myLucky = useRef()
 
@@ -48,12 +49,14 @@ export function LuckyWheelPage({strategyId}) {
     // 调用随机抽奖
     const randomRaffleHandle = async () => {
 
-        const result = await randomRaffle(strategyId);
+        const result = await randomRaffle(strategyId,userId,orderId);
         const {code, info, data} = await result.json();
         if (code != "0000") {
             window.alert("随机抽奖失败 code:" + code + " info:" + info)
             return;
         }
+        showUI()
+        randomOrderId()
         // 为了方便测试，mock 的接口直接返回 awardIndex 也就是奖品列表中第几个奖品。
         return data.awardIndex - 1;
     }
@@ -64,7 +67,6 @@ export function LuckyWheelPage({strategyId}) {
     }, [])
 
     return <div>
-
         <LuckyWheel
             ref={myLucky}
             width="300px"

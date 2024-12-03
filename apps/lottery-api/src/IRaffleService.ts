@@ -3,6 +3,7 @@ import {RaffleAwardListRequestDTO} from "./dto/RaffleAwardListRequestDTO";
 import {RaffleAwardListResponseDTO} from "./dto/RaffleAwardListResponseDTO";
 import {RaffleRequestDTO} from "./dto/RaffleRequestDTO";
 import {RaffleResponseDTO} from "./dto/RaffleResponseDTO";
+import {StrategyRaffleFlowResponseDTO} from "./dto/StrategyRaffleFlowResponseDTO";
 
 
 /**
@@ -32,5 +33,12 @@ export interface IRaffleService {
      * @return 抽奖结果
      */
     randomRaffle(requestDTO:RaffleRequestDTO):Promise<AppResponse<RaffleResponseDTO>>;
+
+
+    /**
+     * 查询抽奖流程 责任链 -> 抉择树
+     */
+    queryStrategyRaffleFlow(orderId:string):Promise<AppResponse<StrategyRaffleFlowResponseDTO>>;
+
 
 }

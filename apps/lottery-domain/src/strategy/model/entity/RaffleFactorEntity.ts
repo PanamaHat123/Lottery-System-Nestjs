@@ -8,5 +8,6 @@ export class RaffleFactorEntity{
     // 策略ID
     strategyId:number;
 
+    orderId:string;
 
 }

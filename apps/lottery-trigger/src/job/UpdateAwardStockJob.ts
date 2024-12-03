@@ -16,7 +16,7 @@ export class UpdateAwardStockJob {
     private init() {
         setInterval(async ()=>{
             try {
-                console.info("定时任务，更新奖品消耗库存【延迟队列获取，降低对数据库的更新频次，不要产生竞争】");
+                // console.info("定时任务，更新奖品消耗库存【延迟队列获取，降低对数据库的更新频次，不要产生竞争】");
                 const strategyAwardStockKeyVO: StrategyAwardStockKeyVO = await this.raffleStock.takeQueueValue();
                 if (!strategyAwardStockKeyVO) return;
                 console.info(`定时任务，更新奖品消耗库存 strategyId:${strategyAwardStockKeyVO.strategyId} awardId:${strategyAwardStockKeyVO.awardId}`);

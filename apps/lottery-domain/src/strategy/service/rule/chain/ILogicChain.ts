@@ -1,5 +1,6 @@
 import {ILogicChainArmory} from "./ILogicChainArmory";
 import {StrategyAwardVO} from "./factory/DefaultChainFactory";
+import {RaffleFactorEntity} from "../../../model/entity/RaffleFactorEntity";
 
 
 export interface ILogicChain extends ILogicChainArmory{
@@ -10,5 +11,7 @@ export interface ILogicChain extends ILogicChainArmory{
      * @param strategyId 策略id
      * @return 奖品id
      */
-    logic(userId:string, strategyId:number):Promise<StrategyAwardVO>;
+    logic(raffleFactorEntity:RaffleFactorEntity):Promise<StrategyAwardVO>;
+
+    ruleModel():string;
 }

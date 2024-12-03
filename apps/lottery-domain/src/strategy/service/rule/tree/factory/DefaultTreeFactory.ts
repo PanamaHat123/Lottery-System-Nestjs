@@ -4,6 +4,9 @@ import {Injectable} from "@nestjs/common";
 import {RuleTreeVO} from "../../../../model/valobj/RuleTreeVO";
 import {IDecisionTreeEngine} from "./engine/IDecisionTreeEngine";
 import {DecisionTreeEngine} from "./engine/DecisionTreeEngine";
+import {
+    StrategyRepository
+} from "../../../../../../../lottery-infrastructure/src/persistent/repository/StrategyRepository";
 
 
 @Injectable()
@@ -12,8 +15,14 @@ export class DefaultTreeFactory {
 
     logicTreeNodeGroup: Map<string, ILogicTreeNode> = new Map();
 
+    constructor(
+        private readonly repository:StrategyRepository,
+    ) {
+    }
+
+
     openLogicTree( ruleTreeVO:RuleTreeVO):IDecisionTreeEngine{
-        return new DecisionTreeEngine(this.logicTreeNodeGroup,ruleTreeVO);
+        return new DecisionTreeEngine(this.logicTreeNodeGroup,ruleTreeVO,this.repository);
     }
 
     register(nodeName:string,node:ILogicTreeNode){
@@ -25,6 +34,7 @@ export class DefaultTreeFactory {
 export class TreeActionEntity{
     ruleLogicCheckType:RuleLogicCheckTypeVOEnum;
     strategyAwardVO:TreeStrategyAwardVO;
+    nodeDesc:string;
 }
 
 export class TreeStrategyAwardVO {

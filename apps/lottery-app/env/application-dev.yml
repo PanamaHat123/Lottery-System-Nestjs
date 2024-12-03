@@ -3,10 +3,10 @@
 
 database:
   type: mysql
-  host: localhost
+  host: 117.72.91.25
   port: 3306
   username: root
-  password: root
+  password: qwa%%123
   database: big-market-nest
   connectorPackage: mysql2
   synchronize: false
@@ -25,7 +25,7 @@ database:
 redis:
   type: single
   options:
-    host: localhost
+    host: 117.72.91.25
     port: 6379
-    password: 
+    password: qwa%%123
     db: 0

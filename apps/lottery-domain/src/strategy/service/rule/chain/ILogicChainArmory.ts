@@ -9,4 +9,10 @@ export interface ILogicChainArmory{
      next():ILogicChain;
 
 
+     appendPrev(prev:ILogicChain):ILogicChain;
+
+     prev():ILogicChain;
+
+
+
 }

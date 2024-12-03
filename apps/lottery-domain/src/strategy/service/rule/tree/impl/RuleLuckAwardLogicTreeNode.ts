@@ -35,6 +35,7 @@ export class RuleLuckAwardLogicTreeNode extends AbstractLogicTreeNode{
         treeStrategyAwardVO.awardId = luckAwardId;
         treeStrategyAwardVO.awardRuleValue = awardRuleValue;
         treeActionEntity.strategyAwardVO = treeStrategyAwardVO;
+        treeActionEntity.nodeDesc = "兜底奖品: "+luckAwardId
         return treeActionEntity;
     }
 

@@ -4,6 +4,11 @@ import {ILogicTreeNode} from "../../ILogicTreeNode";
 import {RuleTreeVO} from "../../../../../model/valobj/RuleTreeVO";
 import {RuleTreeNodeVO} from "../../../../../model/valobj/RuleTreeNodeVO";
 import {RuleTreeNodeLineVO} from "../../../../../model/valobj/RuleTreeNodeLineVO";
+import {RaffleFactorEntity} from "../../../../../model/entity/RaffleFactorEntity";
+import {StrategyFlowRecordEntity} from "../../../../../model/entity/StrategyFlowRecordEntity";
+import {
+    StrategyRepository
+} from "apps/lottery-infrastructure/src/persistent/repository/StrategyRepository";
 
 
 export class DecisionTreeEngine implements IDecisionTreeEngine {
@@ -11,30 +16,63 @@ export class DecisionTreeEngine implements IDecisionTreeEngine {
     private logicTreeNodeGroup: Map<string, ILogicTreeNode>;
 
     private ruleTreeVO: RuleTreeVO;
+    private repository:StrategyRepository;
 
-    constructor(logicTreeNodeGroup: Map<string, ILogicTreeNode>, ruleTreeVO: RuleTreeVO) {
+    constructor(logicTreeNodeGroup: Map<string, ILogicTreeNode>, ruleTreeVO: RuleTreeVO,repository:StrategyRepository) {
         this.logicTreeNodeGroup = logicTreeNodeGroup;
         this.ruleTreeVO = ruleTreeVO;
+        this.repository = repository;
     }
 
 
-    async process(userId: string, strategyId: number, awardId: number): Promise<TreeStrategyAwardVO> {
+    async process(raffleFactorEntity:RaffleFactorEntity, awardId: number): Promise<TreeStrategyAwardVO> {
+
+        let strategyId = raffleFactorEntity.strategyId;
+        let userId = raffleFactorEntity.userId;
+        let orderId = raffleFactorEntity.orderId;
+
         let strategyAwardData: TreeStrategyAwardVO = null;
         //获取基础信息
-        let next: string = this.ruleTreeVO.treeRootRuleNode;
+        let nextNode: string = this.ruleTreeVO.treeRootRuleNode;
         const treeNodeMap: Map<string, RuleTreeNodeVO> = this.ruleTreeVO.treeNodeMap;
-        let ruleTreeNode: RuleTreeNodeVO = treeNodeMap.get(next);
-        while (null != next) {
+        let ruleTreeNode: RuleTreeNodeVO = treeNodeMap.get(nextNode);
+        while (null != nextNode) {
             const logicTreeNode: ILogicTreeNode = this.logicTreeNodeGroup.get(ruleTreeNode.ruleKey);
             const ruleValue = ruleTreeNode.ruleValue;
+
+            //记录流程
+            const strategyFlowRecordEntity = new StrategyFlowRecordEntity();
+            strategyFlowRecordEntity.strategyId = strategyId;
+            strategyFlowRecordEntity.userId = userId;
+            strategyFlowRecordEntity.orderId = orderId;
+            strategyFlowRecordEntity.currentNode = ruleTreeNode.ruleKey;
+            strategyFlowRecordEntity.processType = "tree";
+            strategyFlowRecordEntity.head = (nextNode ==this.ruleTreeVO.treeRootRuleNode) ?1:0;
+            strategyFlowRecordEntity.treeId = this.ruleTreeVO.treeId;
+
 
             const logicEntity: TreeActionEntity =await logicTreeNode.logic(userId, strategyId, awardId, ruleValue);
             const ruleLogicCheckType = logicEntity.ruleLogicCheckType;
             strategyAwardData = logicEntity.strategyAwardVO;
 
-            next = this.nextNode(ruleLogicCheckType, ruleTreeNode.treeNodeLineVOList);
-            console.info(`决策树引擎【${this.ruleTreeVO.treeName}】treeId:${this.ruleTreeVO.treeId} node:${next} code:${ruleLogicCheckType}`);
-            ruleTreeNode = treeNodeMap.get(next);
+            //记录
+            strategyFlowRecordEntity.nodeDesc = logicEntity.nodeDesc;
+            if(null != logicEntity.strategyAwardVO){
+                strategyFlowRecordEntity.awardId = logicEntity.strategyAwardVO.awardId;
+            }else{
+                strategyFlowRecordEntity.awardId = awardId;
+            }
+            strategyFlowRecordEntity.ruleLimitValue =  ruleLogicCheckType;
+            strategyFlowRecordEntity.treeProcessResult =  ruleLogicCheckType;
+
+            nextNode = this.nextNode(ruleLogicCheckType, ruleTreeNode.treeNodeLineVOList);
+            console.info(`决策树引擎【${this.ruleTreeVO.treeName}】treeId:${this.ruleTreeVO.treeId} node:${nextNode} code:${ruleLogicCheckType}`);
+            ruleTreeNode = treeNodeMap.get(nextNode);
+
+            if(ruleTreeNode!=null){
+                strategyFlowRecordEntity.nextNode =ruleTreeNode.ruleKey;
+            }
+            await this.repository.saveStrategyFlowRecord(strategyFlowRecordEntity);
         }
         return strategyAwardData;
     }

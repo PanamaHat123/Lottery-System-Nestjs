@@ -42,14 +42,14 @@ export abstract class AbstractRaffleStrategy implements IRaffleStrategy {
 
 
         // 2. 责任链抽奖计算【这步拿到的是初步的抽奖ID，之后需要根据ID处理抽奖】注意；黑名单、权重等非默认抽奖的直接返回抽奖结果
-        const chainStrategyAwardVO = await this.raffleLogicChain(userId, strategyId);
+        const chainStrategyAwardVO = await this.raffleLogicChain(raffleFactorEntity);
         console.log("抽奖策略计算-责任链 {} {} {} {}", userId, strategyId, chainStrategyAwardVO.awardId, chainStrategyAwardVO.logicModel);
         if (LogicModel.RULE_DEFAULT.code !== chainStrategyAwardVO.logicModel) {
             // TODO awardConfig 暂时为空。黑名单指定积分奖品，后续需要在库表中配置上对应的1积分值，并获取到。
             return this.buildRaffleAwardEntity(strategyId, chainStrategyAwardVO.awardId, null);
         }
         // 3. 规则树抽奖过滤【奖品ID，会根据抽奖次数判断、库存判断、兜底兜里返回最终的可获得奖品信息】todo
-        const treeStrategyAwardVO:TreeStrategyAwardVO = await this.raffleLogicTree(userId, strategyId, chainStrategyAwardVO.awardId);
+        const treeStrategyAwardVO:TreeStrategyAwardVO = await this.raffleLogicTree(raffleFactorEntity, chainStrategyAwardVO.awardId);
         console.info("抽奖策略计算-规则树 {} {} {} {}", userId, strategyId, treeStrategyAwardVO.awardId, treeStrategyAwardVO.awardRuleValue);
 
         return this.buildRaffleAwardEntity(strategyId,treeStrategyAwardVO.awardId,treeStrategyAwardVO.awardRuleValue);
@@ -62,7 +62,7 @@ export abstract class AbstractRaffleStrategy implements IRaffleStrategy {
      * @param strategyId 策略ID
      * @return 奖品ID
      */
-    public abstract raffleLogicChain(userId: string, strategyId: number): Promise<StrategyAwardVO>;
+    public abstract raffleLogicChain(raffleFactorEntity:RaffleFactorEntity): Promise<StrategyAwardVO>;
 
     /**
      * 抽奖结果过滤，决策树抽象方法
@@ -72,7 +72,7 @@ export abstract class AbstractRaffleStrategy implements IRaffleStrategy {
      * @param awardId    奖品ID
      * @return 过滤结果【奖品ID，会根据抽奖次数判断、库存判断、兜底兜里返回最终的可获得奖品信息】
      */
-    public abstract raffleLogicTree(userId: string, strategyId: number, awardId: number): Promise<TreeStrategyAwardVO>;
+    public abstract raffleLogicTree(raffleFactorEntity: RaffleFactorEntity, awardId: number): Promise<TreeStrategyAwardVO>;
 
 
     private async buildRaffleAwardEntity(strategyId: number, awardId: number, awardConfig: string): Promise<RaffleAwardEntity> {

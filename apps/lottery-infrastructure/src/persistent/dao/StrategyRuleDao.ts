@@ -41,5 +41,12 @@ export class StrategyRuleDao {
         return strategyPO.ruleValue
     }
 
+    async queryStrategyRuleList(strategyId:number):Promise<StrategyRulePO[]>{
+        return await this.strategyRulePORepository.find({
+            where:{
+                strategyId:strategyId
+            }
+        })
+    }
 
 }

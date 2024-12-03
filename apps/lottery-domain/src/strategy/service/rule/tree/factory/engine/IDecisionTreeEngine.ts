@@ -1,8 +1,9 @@
 import {TreeStrategyAwardVO} from "../DefaultTreeFactory";
+import {RaffleFactorEntity} from "../../../../../model/entity/RaffleFactorEntity";
 
 
 export interface IDecisionTreeEngine {
 
-    process(userId: string, strategyId: number, awardId: number): Promise<TreeStrategyAwardVO>;
+    process(raffleFactorEntity:RaffleFactorEntity, awardId: number): Promise<TreeStrategyAwardVO>;
 
 }

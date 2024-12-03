@@ -27,6 +27,9 @@ import {RuleLimitTypeVOEnum} from "apps/lottery-domain/src/strategy/model/valobj
 import {RuleLogicCheckTypeVOEnum} from "apps/lottery-domain/src/strategy/model/valobj/RuleLogicCheckTypeVO";
 import {RuleTreeNodeVO} from "apps/lottery-domain/src/strategy/model/valobj/RuleTreeNodeVO";
 import {StrategyAwardStockKeyVO} from "../../../../lottery-domain/src/strategy/model/valobj/StrategyAwardStockKeyVO";
+import {StrategyFlowRecordEntity} from "../../../../lottery-domain/src/strategy/model/entity/StrategyFlowRecordEntity";
+import {StrategyFlowRecordDao} from "../dao/StrategyFlowRecordDao";
+import {StrategyFlowRecordPO} from "../po/StrategyFlowRecordPO.entity";
 
 @Injectable()
 export class StrategyRepository implements IStrategyRepository{
@@ -39,6 +42,7 @@ export class StrategyRepository implements IStrategyRepository{
        private readonly ruleTreeDao:RuleTreeDao,
        private readonly ruleTreeNodeDao:RuleTreeNodeDao,
        private readonly ruleTreeNodeLineDao:RuleTreeNodeLineDao,
+       private readonly strategyFlowRecordDao:StrategyFlowRecordDao,
     ) {
     }
 
@@ -270,4 +274,71 @@ export class StrategyRepository implements IStrategyRepository{
         strategyAward.awardId = awardId;
         await this.strategyAwardDao.updateStrategyAwardStock(strategyAward);
     }
+
+    async queryStrategyByStrategyId(strategyId: number): Promise<StrategyEntity> {
+        const strategyPO = await this.strategyDao.queryStrategyEntityByStrategyId(strategyId);
+        const strategyEntity = new StrategyEntity();
+        strategyEntity.strategyId = strategyPO.strategyId;
+        strategyEntity.strategyDesc = strategyPO.strategyDesc;
+        strategyEntity.ruleModels = strategyPO.ruleModels;
+        return strategyEntity;
+    }
+
+    async saveStrategyFlowRecord(strategyFlowRecordEntity: StrategyFlowRecordEntity): Promise<void> {
+        const strategyFlowRecordPO = new StrategyFlowRecordPO()
+        strategyFlowRecordPO.strategyId = strategyFlowRecordEntity.strategyId;
+        strategyFlowRecordPO.userId = strategyFlowRecordEntity.userId;
+        strategyFlowRecordPO.orderId = strategyFlowRecordEntity.orderId;
+        strategyFlowRecordPO.nodeDesc = strategyFlowRecordEntity.nodeDesc;
+        strategyFlowRecordPO.processType = strategyFlowRecordEntity.processType;
+        strategyFlowRecordPO.chainProcessResult = strategyFlowRecordEntity.chainProcessResult;
+        strategyFlowRecordPO.treeProcessResult = strategyFlowRecordEntity.treeProcessResult;
+        strategyFlowRecordPO.awardId = strategyFlowRecordEntity.awardId;
+        strategyFlowRecordPO.ruleLimitValue = strategyFlowRecordEntity.ruleLimitValue;
+        strategyFlowRecordPO.currentNode = strategyFlowRecordEntity.currentNode;
+        strategyFlowRecordPO.nextNode = strategyFlowRecordEntity.nextNode;
+        strategyFlowRecordPO.head = strategyFlowRecordEntity.head;
+        strategyFlowRecordPO.treeId = strategyFlowRecordEntity.treeId;
+        await this.strategyFlowRecordDao.insert(strategyFlowRecordPO)
+    }
+
+
+
+    async queryStrategyFlowRecordList(orderId: string): Promise<StrategyFlowRecordEntity[]> {
+        const strategyFlowRecords = await this.strategyFlowRecordDao.queryStrategyFlowRecordList(orderId);
+
+        return strategyFlowRecords.map(item=>{
+            const strategyFlowRecordEntity =  new StrategyFlowRecordEntity();
+            strategyFlowRecordEntity.userId = item.userId;
+            strategyFlowRecordEntity.strategyId = item.strategyId;
+            strategyFlowRecordEntity.orderId = item.orderId;
+            strategyFlowRecordEntity.awardId = item.awardId;
+            strategyFlowRecordEntity.nodeDesc = item.nodeDesc;
+            strategyFlowRecordEntity.processType = item.processType;
+            strategyFlowRecordEntity.chainProcessResult = item.chainProcessResult;
+            strategyFlowRecordEntity.treeProcessResult = item.treeProcessResult;
+            strategyFlowRecordEntity.ruleLimitValue = item.ruleLimitValue;
+            strategyFlowRecordEntity.currentNode = item.currentNode;
+            strategyFlowRecordEntity.nextNode = item.nextNode;
+            strategyFlowRecordEntity.head = item.head;
+            strategyFlowRecordEntity.treeId = item.treeId;
+            return strategyFlowRecordEntity
+        })
+    }
+
+    async queryStrategyRuleList(strategyId: number): Promise<StrategyRuleEntity[]> {
+        const  strategyRules = await this.strategyRuleDao.queryStrategyRuleList(strategyId);
+        return strategyRules.map(item=> {
+            const strategyRuleEntity = new StrategyRuleEntity();
+            strategyRuleEntity.strategyId = item.strategyId;
+            strategyRuleEntity.awardId = item.awardId;
+            strategyRuleEntity.ruleModel = item.ruleModel;
+            strategyRuleEntity.ruleValue = item.ruleValue;
+            strategyRuleEntity.ruleDesc = item.ruleDesc;
+            strategyRuleEntity.ruleType = item.ruleType;
+            return strategyRuleEntity
+        })
+    }
+
+
 }

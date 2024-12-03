@@ -5,6 +5,7 @@ import {StrategyRuleEntity} from "../model/entity/StrategyRuleEntity";
 import {StrategyAwardRuleModelVO} from "../model/valobj/StrategyAwardRuleModelVO";
 import {RuleTreeVO} from "../model/valobj/RuleTreeVO";
 import {StrategyAwardStockKeyVO} from "../model/valobj/StrategyAwardStockKeyVO";
+import {StrategyFlowRecordEntity} from "../model/entity/StrategyFlowRecordEntity";
 
 
 export interface IStrategyRepository {
@@ -34,5 +35,13 @@ export interface IStrategyRepository {
     subtractionAwardStock(cacheKey: string):Promise<boolean> ;
 
     awardStockConsumeSendQueue(strategyAwardStockKeyVO: StrategyAwardStockKeyVO):Promise<void>;
+
+    queryStrategyRuleList(strategyId:number):Promise<StrategyRuleEntity[]>;
+
+    queryStrategyFlowRecordList(orderId:string):Promise<StrategyFlowRecordEntity[]>;
+
+    queryStrategyByStrategyId(strategyId:number):Promise<StrategyEntity>;
+
+    saveStrategyFlowRecord(strategyFlowRecordEntity:StrategyFlowRecordEntity):Promise<void>;
 
 }

@@ -41,6 +41,7 @@ export class RuleStockLogicTreeNode extends AbstractLogicTreeNode {
             treeStrategyAwardVO.awardId = awardId;
             treeStrategyAwardVO.awardRuleValue = '';
             treeActionEntity.strategyAwardVO = treeStrategyAwardVO;
+            treeActionEntity.nodeDesc = `库存扣减: 库存扣减成功  awardId: ${awardId}`;
             return treeActionEntity;
         }
         console.info(`规则过滤-库存扣减-失败 userId: ${userId} strategyId: ${strategyId} awardId: ${awardId} CheckType:${RuleLogicCheckTypeVO.TAKE_OVER}`);

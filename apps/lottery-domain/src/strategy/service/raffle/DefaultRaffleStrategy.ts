@@ -11,6 +11,7 @@ import {IDecisionTreeEngine} from "../rule/tree/factory/engine/IDecisionTreeEngi
 import {StrategyAwardStockKeyVO} from "../../model/valobj/StrategyAwardStockKeyVO";
 import {IRaffleStock} from "../IRaffleStock";
 import {IRaffleAward} from "../IRaffleAward";
+import {RaffleFactorEntity} from "../../model/entity/RaffleFactorEntity";
 
 
 
@@ -29,13 +30,13 @@ export class DefaultRaffleStrategy extends AbstractRaffleStrategy implements IRa
         super(repository,strategyDispatch,defaultChainFactory);
     }
 
-    async raffleLogicChain(userId: string, strategyId: number): Promise<StrategyAwardVO> {
-        const logicChain:ILogicChain = await this.defaultChainFactory.openLogicChain(strategyId);
-        return logicChain.logic(userId, strategyId);
+    async raffleLogicChain(raffleFactorEntity:RaffleFactorEntity): Promise<StrategyAwardVO> {
+        const logicChain:ILogicChain = await this.defaultChainFactory.openLogicChain(raffleFactorEntity.strategyId);
+        return logicChain.logic(raffleFactorEntity);
     }
 
-    async raffleLogicTree(userId: string, strategyId: number, awardId: number): Promise<TreeStrategyAwardVO> {
-        const strategyAwardRuleModelVO:StrategyAwardRuleModelVO = await this.repository.queryStrategyAwardRuleModelVO(strategyId, awardId);
+    async raffleLogicTree(raffleFactorEntity: RaffleFactorEntity, awardId: number): Promise<TreeStrategyAwardVO> {
+        const strategyAwardRuleModelVO:StrategyAwardRuleModelVO = await this.repository.queryStrategyAwardRuleModelVO(raffleFactorEntity.strategyId, awardId);
         //奖品没有自己的规则
         if(strategyAwardRuleModelVO == null){
             const treeStrategyAwardVO = new TreeStrategyAwardVO()
@@ -47,7 +48,7 @@ export class DefaultRaffleStrategy extends AbstractRaffleStrategy implements IRa
             throw new Error("存在抽奖策略配置的规则模型 Key，未在库表 rule_tree、rule_tree_node、rule_tree_line 配置对应的规则树信息 " + strategyAwardRuleModelVO.ruleModels);
         }
         const treeEngine :IDecisionTreeEngine= this.defaultTreeFactory.openLogicTree(ruleTreeVO);
-        return treeEngine.process(userId, strategyId, awardId);
+        return treeEngine.process(raffleFactorEntity, awardId);
     }
 
 

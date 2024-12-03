@@ -6,7 +6,7 @@ const apiHostUrl = process.env.API_HOST_URL ? process.env.API_HOST_URL : "https:
  * @param strategyId
  */
 export const strategyArmory = (strategyId?: number) => {
-    return fetch(`${apiHostUrl}/api/v1/raffle/strategy_armory?strategyId=${strategyId}`, {
+    return fetch(`${apiHostUrl}/api/v1/raffle/strategy/strategy_armory?strategyId=${strategyId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ export const strategyArmory = (strategyId?: number) => {
  */
 export const queryRaffleAwardList = (strategyId?: number) => {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/query_raffle_award_list`, {
+        return fetch(`${apiHostUrl}/api/v1/raffle/strategy/query_raffle_award_list`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -52,15 +52,17 @@ export const queryRaffleAwardList = (strategyId?: number) => {
  * 	}
  * }
  */
-export const randomRaffle = (strategyId?: number) => {
+export const randomRaffle = (strategyId?: number,userId?:string,orderId?:string) => {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/random_raffle`, {
+        return fetch(`${apiHostUrl}/api/v1/raffle/strategy/random_raffle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
             },
             body: JSON.stringify({
-                strategyId: strategyId
+                strategyId: strategyId,
+                userId:userId,
+                orderId:orderId
             })
         })
     } catch (error) {
@@ -70,4 +72,29 @@ export const randomRaffle = (strategyId?: number) => {
             "    \"data\": [\n" +
             "}");
     }
+}
+/**
+ * 查询规则树
+ * @param treeId
+ */
+export const strategyRuleTree = (treeId?: string) => {
+    return fetch(`${apiHostUrl}/api/v1/raffle/strategy/rule_tree?treeId=${treeId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+/**
+ * 查询抽奖流程记录，用于流程可视化
+ * @param treeId
+ */
+export const raffleFlowAndStrategy = (orderId?: string) => {
+    return fetch(`${apiHostUrl}/api/v1/raffle/strategy/raffle_flow?orderId=${orderId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 }

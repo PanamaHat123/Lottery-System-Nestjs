@@ -4,4 +4,6 @@
 export class RaffleRequestDTO {
     // 抽奖策略ID
     strategyId:number;
+    userId:string;
+    orderId:string;
 }

@@ -1,5 +1,4 @@
 import {strategyArmory} from "@/apis";
-import {useState} from "react";
 
 export function StrategyArmory({strategyId}) {
 

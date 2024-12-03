@@ -24,13 +24,18 @@ export class DefaultChainFactory{
             return this.logicChainGroup.get("rule_default");
         }
         const logicChain:ILogicChain = this.logicChainGroup.get(ruleModels[0]);
+        let prev:ILogicChain = null;
         let current:ILogicChain = logicChain;
+        current.appendPrev(prev);
         for (let i = 1; i < ruleModels.length; i++) {
             const nextChain:ILogicChain = this.logicChainGroup.get(ruleModels[i]);
+            prev = current;
             current = current.appendNext(nextChain);
+            current.appendPrev(prev);
         }
-        current.appendNext(this.logicChainGroup.get("rule_default"));
-        
+        const default1 = this.logicChainGroup.get("rule_default");
+        default1.appendPrev(current);
+        current.appendNext(default1);
         return logicChain;
     }
 

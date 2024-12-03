@@ -17,14 +17,16 @@ import {RuleTreeNodePO} from "./persistent/po/RuleTreeNodePO.entity";
 import {RuleTreeNodeDao} from "./persistent/dao/RuleTreeNodeDao";
 import {RuleTreeNodeLinePO} from "./persistent/po/RuleTreeNodeLinePO.entity";
 import {RuleTreeNodeLineDao} from "./persistent/dao/RuleTreeNodeLineDao";
+import {StrategyFlowRecordPO} from "./persistent/po/StrategyFlowRecordPO.entity";
+import {StrategyFlowRecordDao} from "./persistent/dao/StrategyFlowRecordDao";
 
 //数据看实体对象
 const po = [
-    StrategyPO,StrategyAwardPO,StrategyRulePO,AwardPO,RuleTreePO,RuleTreeNodePO,RuleTreeNodeLinePO
+    StrategyPO,StrategyAwardPO,StrategyRulePO,AwardPO,RuleTreePO,RuleTreeNodePO,RuleTreeNodeLinePO,StrategyFlowRecordPO
 ]
 // dao
 const dao = [
-    StrategyDao,StrategyAwardDao,StrategyRuleDao,AwardDao,RuleTreeDao,RuleTreeNodeDao,RuleTreeNodeLineDao
+    StrategyDao,StrategyAwardDao,StrategyRuleDao,AwardDao,RuleTreeDao,RuleTreeNodeDao,RuleTreeNodeLineDao,StrategyFlowRecordDao
 ]
 // 暴露的服务
 const service = [

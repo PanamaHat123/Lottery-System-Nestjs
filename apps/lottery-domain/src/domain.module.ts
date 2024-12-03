@@ -12,13 +12,14 @@ import {DefaultTreeFactory} from "./strategy/service/rule/tree/factory/DefaultTr
 import {RuleLockLogicTreeNode} from "./strategy/service/rule/tree/impl/RuleLockLogicTreeNode";
 import {RuleLuckAwardLogicTreeNode} from "./strategy/service/rule/tree/impl/RuleLuckAwardLogicTreeNode";
 import {RuleStockLogicTreeNode} from "./strategy/service/rule/tree/impl/RuleStockLogicTreeNode";
+import {RaffleFlowService} from "./strategy/service/raffle/RaffleFlowService";
 
 
 
 const service = [
     TestService,StrategyArmoryDispatch,DefaultRaffleStrategy,DefaultChainFactory,BlackListLogicChain,
     DefaultLogicChain,RuleWeightLogicChain,DefaultTreeFactory,RuleLockLogicTreeNode,RuleLuckAwardLogicTreeNode,
-    RuleStockLogicTreeNode
+    RuleStockLogicTreeNode,RaffleFlowService
 ]
 
 @Module({

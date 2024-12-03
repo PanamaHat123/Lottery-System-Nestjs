@@ -1,10 +1,12 @@
 import {ILogicChain} from "./ILogicChain";
 import {DefaultChainFactory, StrategyAwardVO} from "./factory/DefaultChainFactory";
+import {RaffleFactorEntity} from "../../../model/entity/RaffleFactorEntity";
 
 
 export abstract class AbstractLogicChain implements ILogicChain {
 
     private nextChain:ILogicChain;
+    private prevChain:ILogicChain;
 
     protected constructor(defaultChainFactory:DefaultChainFactory) {
        defaultChainFactory.register(this.ruleModel(),this);
@@ -20,8 +22,18 @@ export abstract class AbstractLogicChain implements ILogicChain {
         return this.nextChain;
     }
 
-    abstract logic(userId: string, strategyId: number): Promise<StrategyAwardVO> ;
+    public appendPrev(prev:ILogicChain):ILogicChain {
+        this.prevChain = prev;
+        return prev;
+    }
 
-    protected abstract ruleModel():string;
+    public prev():ILogicChain {
+        return this.prevChain;
+    }
+
+
+    abstract logic(raffleFactorEntity:RaffleFactorEntity): Promise<StrategyAwardVO> ;
+
+    public abstract ruleModel():string;
 
 }
