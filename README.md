@@ -2,8 +2,15 @@
 
 
 
-<div style="display: flex;align-items: center;justify-content: center;padding-top: 20px">
-    <img style="width: 300px;"  src="https://raw.githubusercontent.com/PanamaHat123/images/refs/heads/master/raffle%E5%89%8D%E7%AB%AF%E5%B1%95%E7%A4%BA.png"/>
+<div style="display: flex;align-items: start;justify-content: center;padding-top: 20px">
+    <div style="display: flex;flex-direction: column;font-size: 14px;margin-right: 12px">
+        <span>抽奖流程可视化1: 抽奖经过责任链再到抉择树</span>
+        <img style="width: 300px;"  src="https://raw.githubusercontent.com/PanamaHat123/images/refs/heads/master/%E8%B4%A3%E4%BB%BB%E9%93%BE%E5%8A%A0%E6%8A%89%E6%8B%A9%E6%A0%91.png"/>
+    </div>
+    <div style="display: flex;flex-direction: column;font-size: 14px">
+        <span>抽奖流程可视化2: 责任链接管中奖</span>
+        <img style="width: 300px;"  src="https://raw.githubusercontent.com/PanamaHat123/images/refs/heads/master/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%8E%A5%E7%AE%A1.png"/>
+    </div>
 </div>
 
 ## 项目描述
