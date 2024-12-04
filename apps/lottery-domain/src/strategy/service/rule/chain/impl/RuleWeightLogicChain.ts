@@ -9,6 +9,7 @@ import {StrategyAwardEntity} from "../../../../model/entity/StrategyAwardEntity"
 import {AppConstants} from "apps/lottery-types/src/common/AppConstants";
 import {RaffleFactorEntity} from "../../../../model/entity/RaffleFactorEntity";
 import {StrategyFlowRecordEntity} from "../../../../model/entity/StrategyFlowRecordEntity";
+import {RuleLogicCheckTypeVO} from "../../../../model/valobj/RuleLogicCheckTypeVO";
 
 
 @Injectable()
@@ -17,12 +18,12 @@ export class RuleWeightLogicChain  extends AbstractLogicChain{
     userScore:number = 3000;
 
     constructor(
-        private readonly repository:StrategyRepository,
+        public readonly repository:StrategyRepository,
         private readonly strategyDispatch:StrategyArmoryDispatch,
         private readonly defaultChainFactory:DefaultChainFactory,
 
     ) {
-        super(defaultChainFactory);
+        super(defaultChainFactory,repository);
     }
 
     /**
@@ -30,7 +31,7 @@ export class RuleWeightLogicChain  extends AbstractLogicChain{
      * 1. 权重规则格式；4000:102,103,104,105 5000:102,103,104,105,106,107 6000:102,103,104,105,106,107,108,109
      * 2. 解析数据格式；判断哪个范围符合用户的特定抽奖范围
      */
-    async logic(raffleFactorEntity:RaffleFactorEntity): Promise<StrategyAwardVO> {
+    async doLogic(raffleFactorEntity:RaffleFactorEntity): Promise<StrategyAwardVO> {
         let strategyId = raffleFactorEntity.strategyId
         let userId = raffleFactorEntity.userId
         let orderId = raffleFactorEntity.orderId
@@ -52,39 +53,25 @@ export class RuleWeightLogicChain  extends AbstractLogicChain{
             .sort((a, b) => b - a) // 降序排序
             .find(analyticalSortedKeyValue => this.userScore >= analyticalSortedKeyValue);
 
-        //记录流程
-        const strategyFlowRecordEntity = new StrategyFlowRecordEntity();
-        strategyFlowRecordEntity.strategyId = strategyId;
-        strategyFlowRecordEntity.userId = userId;
-        strategyFlowRecordEntity.orderId = orderId;
-        strategyFlowRecordEntity.currentNode = this.ruleModel();
-        strategyFlowRecordEntity.processType = "chain";
-        strategyFlowRecordEntity.head = this.prev() == null?1:0;
-        if(null != this.next()){
-            strategyFlowRecordEntity.nextNode = this.next().ruleModel();
-        }
-
         if (nextValue != null) {
             let awardId = await this.strategyDispatch.getRandomAwardId(strategyId, analyticalValueGroup.get(nextValue));
             console.info(`抽奖责任链-权重接管 userId: ${userId} strategyId:${strategyId} ruleModel: ${this.ruleModel()} awardId:${awardId}`);
 
-            strategyFlowRecordEntity.nodeDesc = "权重接管-权重配置:" + ruleValue + ";当前权重:" + this.userScore+";awardId:"+awardId;
-            strategyFlowRecordEntity.chainProcessResult = "TAKE_OVER"
-            strategyFlowRecordEntity.awardId = awardId
-            await this.repository.saveStrategyFlowRecord(strategyFlowRecordEntity);
-
             return {
                 awardId: awardId,
+                processResult: RuleLogicCheckTypeVO.TAKE_OVER,
+                nodeDesc: "权重接管-权重配置:" + ruleValue + ";当前权重:" + this.userScore+"; awardId"+awardId,
                 logicModel: this.ruleModel()
             };
         }
         // 5. 过滤其他责任链
         console.info(`抽奖责任链-权重放行 userId: ${userId} strategyId: ${strategyId} ruleModel: ${this.ruleModel()}`);
 
-        strategyFlowRecordEntity.nodeDesc ="权重放行-权重配置:" + ruleValue + ";当前权重:" + this.userScore;
-        strategyFlowRecordEntity.chainProcessResult = "ALLOW"
-        await this.repository.saveStrategyFlowRecord(strategyFlowRecordEntity);
-        return this.next().logic(raffleFactorEntity);
+        return  {
+            processResult: RuleLogicCheckTypeVO.ALLOW,
+            nodeDesc: "权重放行-权重配置:" + ruleValue + ";当前权重:" + this.userScore,
+            logicModel: this.ruleModel()
+        };
     }
 
     public ruleModel(): string {

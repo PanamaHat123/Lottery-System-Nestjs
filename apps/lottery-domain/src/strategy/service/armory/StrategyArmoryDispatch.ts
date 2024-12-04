@@ -59,7 +59,7 @@ export class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
 
     async doAssembleLotteryStrategy(key: string, strategyAwardEntities: StrategyAwardEntity[]): Promise<void> {
         //1. 获取最小概率值
-        const minAwardRate: Decimal = strategyAwardEntities.reduce((minItem: StrategyAwardEntity | null, currentItem) => {
+        const minAwardRate: Decimal = strategyAwardEntities.filter(item=>item.awardRate.toNumber()!=0).reduce((minItem: StrategyAwardEntity | null, currentItem) => {
             if (!minItem || currentItem.awardRate.lessThan(minItem.awardRate)) {
                 return currentItem
             }

@@ -13,5 +13,8 @@ export interface ILogicChain extends ILogicChainArmory{
      */
     logic(raffleFactorEntity:RaffleFactorEntity):Promise<StrategyAwardVO>;
 
+    //记录责任链处理结果
+    record(raffleFactorEntity:RaffleFactorEntity,strategyAwardVO:StrategyAwardVO):Promise<void>;
+
     ruleModel():string;
 }

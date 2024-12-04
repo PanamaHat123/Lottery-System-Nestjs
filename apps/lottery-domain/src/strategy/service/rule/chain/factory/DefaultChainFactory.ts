@@ -48,10 +48,13 @@ export class DefaultChainFactory{
 
 export class StrategyAwardVO {
     /** 抽奖奖品ID - 内部流转使用 */
-    awardId:number;
+    awardId?:number;
     /**  */
     logicModel:string;
-
+    //节点处理结果  TAKE_OVER ALLOW
+    processResult:string;
+    //节点处理信息描述
+    nodeDesc:string;
 }
 export class LogicModel {
 

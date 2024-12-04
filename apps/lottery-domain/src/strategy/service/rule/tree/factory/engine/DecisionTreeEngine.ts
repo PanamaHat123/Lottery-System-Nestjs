@@ -29,7 +29,6 @@ export class DecisionTreeEngine implements IDecisionTreeEngine {
 
         let strategyId = raffleFactorEntity.strategyId;
         let userId = raffleFactorEntity.userId;
-        let orderId = raffleFactorEntity.orderId;
 
         let strategyAwardData: TreeStrategyAwardVO = null;
         //获取基础信息
@@ -37,44 +36,46 @@ export class DecisionTreeEngine implements IDecisionTreeEngine {
         const treeNodeMap: Map<string, RuleTreeNodeVO> = this.ruleTreeVO.treeNodeMap;
         let ruleTreeNode: RuleTreeNodeVO = treeNodeMap.get(nextNode);
         while (null != nextNode) {
+            const currentLogicTreeNodeVO = ruleTreeNode;
             const logicTreeNode: ILogicTreeNode = this.logicTreeNodeGroup.get(ruleTreeNode.ruleKey);
             const ruleValue = ruleTreeNode.ruleValue;
-
-            //记录流程
-            const strategyFlowRecordEntity = new StrategyFlowRecordEntity();
-            strategyFlowRecordEntity.strategyId = strategyId;
-            strategyFlowRecordEntity.userId = userId;
-            strategyFlowRecordEntity.orderId = orderId;
-            strategyFlowRecordEntity.currentNode = ruleTreeNode.ruleKey;
-            strategyFlowRecordEntity.processType = "tree";
-            strategyFlowRecordEntity.head = (nextNode ==this.ruleTreeVO.treeRootRuleNode) ?1:0;
-            strategyFlowRecordEntity.treeId = this.ruleTreeVO.treeId;
-
 
             const logicEntity: TreeActionEntity =await logicTreeNode.logic(userId, strategyId, awardId, ruleValue);
             const ruleLogicCheckType = logicEntity.ruleLogicCheckType;
             strategyAwardData = logicEntity.strategyAwardVO;
 
-            //记录
-            strategyFlowRecordEntity.nodeDesc = logicEntity.nodeDesc;
-            if(null != logicEntity.strategyAwardVO){
-                strategyFlowRecordEntity.awardId = logicEntity.strategyAwardVO.awardId;
-            }else{
-                strategyFlowRecordEntity.awardId = awardId;
-            }
-            strategyFlowRecordEntity.ruleLimitValue =  ruleLogicCheckType;
-            strategyFlowRecordEntity.treeProcessResult =  ruleLogicCheckType;
-
             nextNode = this.nextNode(ruleLogicCheckType, ruleTreeNode.treeNodeLineVOList);
             console.info(`决策树引擎【${this.ruleTreeVO.treeName}】treeId:${this.ruleTreeVO.treeId} node:${nextNode} code:${ruleLogicCheckType}`);
             ruleTreeNode = treeNodeMap.get(nextNode);
 
-            if(ruleTreeNode!=null){
-                strategyFlowRecordEntity.nextNode =ruleTreeNode.ruleKey;
-            }
-            await this.repository.saveStrategyFlowRecord(strategyFlowRecordEntity);
+            //记录在抉择树处理结果
+            await this.record(raffleFactorEntity, currentLogicTreeNodeVO, logicEntity, awardId, ruleTreeNode);
         }
         return strategyAwardData;
+    }
+
+    private async record(raffleFactorEntity: RaffleFactorEntity, currentLogicTreeNodeVO: RuleTreeNodeVO, logicEntity: TreeActionEntity, awardId: number, nextLogicTreeNodeVo: RuleTreeNodeVO) {
+        //记录流程
+        const strategyFlowRecordEntity = new StrategyFlowRecordEntity();
+        strategyFlowRecordEntity.strategyId = raffleFactorEntity.strategyId;
+        strategyFlowRecordEntity.userId = raffleFactorEntity.userId;
+        strategyFlowRecordEntity.orderId = raffleFactorEntity.orderId;
+        strategyFlowRecordEntity.currentNode = currentLogicTreeNodeVO.ruleKey;
+        strategyFlowRecordEntity.processType = "tree";
+        strategyFlowRecordEntity.head = (currentLogicTreeNodeVO.ruleKey == this.ruleTreeVO.treeRootRuleNode) ? 1 : 0;
+        strategyFlowRecordEntity.treeId = this.ruleTreeVO.treeId;
+        //记录
+        strategyFlowRecordEntity.nodeDesc = logicEntity.nodeDesc;
+        if (null != logicEntity.strategyAwardVO) {
+            strategyFlowRecordEntity.awardId = logicEntity.strategyAwardVO.awardId;
+        } else {
+            strategyFlowRecordEntity.awardId = awardId;
+        }
+        strategyFlowRecordEntity.treeProcessResult = logicEntity.ruleLogicCheckType;
+        if (nextLogicTreeNodeVo != null) {
+            strategyFlowRecordEntity.nextNode = nextLogicTreeNodeVo.ruleKey;
+        }
+        await this.repository.saveStrategyFlowRecord(strategyFlowRecordEntity);
     }
 
     private nextNode(matterValue: string, ruleTreeNodeLineVOList: RuleTreeNodeLineVO[]): string {

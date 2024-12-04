@@ -206,7 +206,7 @@ function assembleTree(tree: any) {
             let lineNode = {
                 source: line.ruleNodeFrom,
                 target: line.ruleNodeTo,
-                type: line.treeProcessResult,
+                type: line.ruleLimitValue,
                 label: gloalLineLabel
             }
             //已处理过的连线  防止死递归
